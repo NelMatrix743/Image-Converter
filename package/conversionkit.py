@@ -83,6 +83,6 @@ class ImageTransformer():
 
 if __name__ == "__main__": 
     module_version: str = "1.0.0"
-    print(f"Name: conversionkit.py \nVersion: {module_version}")
+    print(f"Name: conversionkit.py \nVersion: {module_version}\nFile Path: {__file__}")
 
 # end of program 

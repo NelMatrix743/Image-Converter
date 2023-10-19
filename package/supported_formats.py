@@ -9,3 +9,7 @@ class ImgFormats(Enum):
     WEBP: str = 3
 
 # end of enum class implementation 
+
+if __name__ == "__main__": 
+    module_version: str = "1.0.0"
+    print(f"Name: supported_formats.py \nVersion: {module_version}\nFile Path: {__file__}")
