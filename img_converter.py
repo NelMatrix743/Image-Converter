@@ -21,7 +21,7 @@ from package import screen, supported_formats
 
 
 # simple exception class 
-class WrongOutputException(Exception): 
+class PathDoesNotExistsException(Exception): 
     pass
 
 
@@ -30,17 +30,19 @@ PROG_DESCRIPTION: str = """This is a simple command line utility to convert imag
                         """
 EXIT_MESSAGE: str = """ This is a simple exit message"""
 
-#==================================================================== ERROR MESSAGES ================================================================#
-INVALID_INPUT_ERROR: str = "Invalid input! The path you entered does not represent an image file."
+#=============================================================== ERROR MESSAGES ================================================================================#
+NOT_A_PATH_TO_A_FILE_ERROR: str = """ERROR! The pathname you entered leads to a directory.\nUse the (-d) option if you want to process files in a directory."""
 
-NOT_A_SUPPORTED_FILE_INPUT_ERROR: str = "Error! This file is not supported. Conversion cannot take place.\nPlease enter a valid image file."
+NOT_A_SUPPORTED_FILE_INPUT_ERROR: str = "ERROR! This file is not supported. Conversion cannot take place.\nPlease enter the pathname of a valid image file."
 
-PATH_DOES_NOT_EXISTS_ERROR: str = "Error! The path you entered does not exists on your system. Please enter a valid path."
+INPUT_PATH_DOES_NOT_EXISTS_ERROR: str = "ERROR! The pathname you entered does not exists on your system. Please enter a valid pathname."
 
-PATH_IS_NOT_A_DIRECTORY_OR_DOES_NOT_EXISTS: str = "Error! The path you entered does not represent a directory or it does not exists on your system."
+PATH_IS_NOT_A_DIRECTORY_OR_DOES_NOT_EXISTS_ERROR: str = "ERROR! The pathname you entered does not represent a directory or it does not exists on your system."
 
-INVALID_OUTPUT_PATH_ERROR: str = "Invalid output: The output file-path you provided does not exist!"
-#====================================================================================================================================================#
+OUTPUT_PATH_DOES_NOT_EXISTS_ERROR: str = "ERROR! The output pathname you provided does not exist."
+
+OUTPUT_DIRECTORY_PATH_DOES_NOT_EXISTS_ERROR: str = "ERROR! The output pathname you provided is invalid, or it does not exists on your system." 
+#===============================================================================================================================================================#
 
 
 def parser_initialiser() -> argparse.ArgumentParser: 
@@ -110,17 +112,19 @@ def is_a_valid_imagefile(name: str) -> bool:
 
 
 def parse_output_file_path(arg: argparse.Namespace) -> str | None:
-    raw_ : str = arg.o # output  
+    raw_ : str = arg.o # output;
     sep_ : str = return_seperator(raw_)
-    # writing code to check if the file path seperator (based on the platform) is present in the output: 
-    if not sep_:
-        return os.path.join(os.getcwd(), name_with_exten(arg, raw_))
-    
-    components: list[str] = raw_.split(sep_)
-    if is_a_valid_imagefile(components[-1]) and os.path.exists(str.join(sep_, components[0:len(components)-1])): 
-        return raw_
-    
-    raise WrongOutputException # wrong output 
+
+    refined_ : str = os.path.realpath(raw_) # to refine the provided pathname for further processing;
+    components: list[str] = refined_.split(sep_)
+    pre_output_file_name: str = components.pop(-1) # remove and store filename because it is does not exist yet;
+    #print(sep_ + str.join(sep_, components))
+
+    if os.path.exists(str.join(sep_, components)):
+        components.append(name_with_exten(arg, pre_output_file_name))
+        return os.path.join(*components) # return the final pathname result;
+
+    raise PathDoesNotExistsException # wrong output;
     
 
 def custom_output_file_path(a_0x0:argparse.Namespace, in_path: str) -> str: 
@@ -175,32 +179,36 @@ def run_program(parser: argparse.ArgumentParser) -> None:
             if os.path.isfile(_file):
                 file_name, file_exten = os.path.basename(_file).split('.')
                 if not file_exten.upper() in {"JPEG", "PNG", "JPG", "WEBP", "SVG"}: 
-                    screen.error_message_display(NOT_A_SUPPORTED_FILE_INPUT_ERROR) # file is not an image, or a wrong image file;
+                    screen.error_message_display(NOT_A_SUPPORTED_FILE_INPUT_ERROR) # file is not an image, or it a wrong image file format;
                     return
                 input_path = _file  # path is valid and leads to a supported image file;  
-            else: # input is not a file;
-                screen.error_message_display(INVALID_INPUT_ERROR) # not a file input;
+                
+            else: # if the pathname leads to a directory instead of a file;
+                screen.error_message_display(NOT_A_PATH_TO_A_FILE_ERROR) 
                 return
         else: # path does not exists;
-            screen.error_message_display(PATH_DOES_NOT_EXISTS_ERROR)
+            screen.error_message_display(INPUT_PATH_DOES_NOT_EXISTS_ERROR)
             return
+        
         if args_namespace.o:  # parse output/destination path;
            try: 
                output_path = parse_output_file_path(args_namespace)
-           except WrongOutputException: 
-               screen.error_message_display(INVALID_OUTPUT_PATH_ERROR)  
-               return     
+               print(output_path)
+           except PathDoesNotExistsException: 
+               screen.error_message_display(OUTPUT_PATH_DOES_NOT_EXISTS_ERROR)  
+               return
         else: 
             output_path = custom_output_file_path(args_namespace, input_path) # return custom output path; 
         
         run_single_conversion_task(args_namespace, input_path, output_path)
         return # terminate the function;
 
+
     # MULTIPLE INPUT FILES (directory mode);
     if args_namespace.d:  
         in_path: str = args_namespace.d
         if not (os.path.exists(in_path) and os.path.isdir(in_path)):
-           screen.error_message_display(PATH_IS_NOT_A_DIRECTORY_OR_DOES_NOT_EXISTS)
+           screen.error_message_display(PATH_IS_NOT_A_DIRECTORY_OR_DOES_NOT_EXISTS_ERROR)
            return
         valid_input_iterator: Iterator[str] = supported_file_input_iterator(in_path)
 
@@ -208,7 +216,7 @@ def run_program(parser: argparse.ArgumentParser) -> None:
             # parse output directory for storing converted image files;
             output_path = parse_output_directory_path(args_namespace)
             if not output_path:
-                screen.error_message_display("OUTPUT DIRECTORY PATH DOES NOT EXIST! YOU MUST FIRST CREATE IT.")
+                screen.error_message_display(OUTPUT_DIRECTORY_PATH_DOES_NOT_EXISTS_ERROR)
                 return
             
         # if user did not specify output directory:
