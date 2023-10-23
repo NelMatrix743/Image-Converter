@@ -139,13 +139,7 @@ def custom_output_file_path(a_0x0:argparse.Namespace, in_path: str) -> str:
 
 def parse_output_directory_path(output_dir_: argparse.Namespace) -> str | None: 
     raw_ : str = output_dir_.o 
-    sep_ : str | None = return_seperator(raw_)
-    final_output_path: str | None = None
-
-    # checking if the input directory path does not start with a seperator;
-    if not raw_.startswith(sep_):
-        raw_ = sep_ + raw_ # add a seperator at the beginning
-    raw_ = raw_.rstrip(sep_) # refine the output path by removing trailing seperator(s)
+    raw_ = os.path.realpath(raw_) # refining the output;    
 
      # check if the specified output path exists and if it is a directory:
     if os.path.exists(raw_) and os.path.isdir(raw_):

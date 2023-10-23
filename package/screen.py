@@ -25,19 +25,19 @@ def welcome_screen() -> None:
 def success_message_display(message: str) -> None: 
     """ Displays success message when a task is sucessfully completed """
     __message__: str = Fore.GREEN + message
-    print(__message__, Style.RESET_ALL) # print message and reset color;
+    print(__message__, Style.RESET_ALL, end='') # print message and reset color;
 
 
 def error_message_display(message: str) -> None: 
     """ Displays error message when a task is not sucessfully completed due to an error """
     __message__: str = Fore.RED + message
-    print(__message__, Style.RESET_ALL) # print message and reset color;
+    print(__message__, Style.RESET_ALL, end='') # print message and reset color;
 
 
 def in_process_message_display(message: str) -> None:
     """ Displays a message when the program is currently processing a file """
     __message__: str = Fore.YELLOW + message
-    print(__message__, Style.RESET_ALL) # print message and reset color;
+    print(__message__, Style.RESET_ALL, end='') # print message and reset color;
 
 
 
