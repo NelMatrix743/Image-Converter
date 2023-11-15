@@ -19,15 +19,16 @@ class ImageTransformer():
     def jpeg_to_(self, conversion_type: ImgFormats) -> bool:
         try:
             if conversion_type.name == ImgFormats.PNG.name: 
-                image_object = Image.open(self.input_path).convert("RGB")
-                image_object.save(self.output_path, "JPEG")
+                image_object = Image.open(self.input_path).convert("RGBA")
+                image_object.save(self.output_path, "PNG")
 
             elif conversion_type.name == ImgFormats.WEBP.name: 
                 image_object = Image.open(self.input_path).convert("RGB")
                 image_object.save(self.output_path, "WEBP")
 
             elif conversion_type.name == ImgFormats.SVG.name: 
-                pass 
+                self.__convert_raster_to_svg_()
+
             return True
         except: 
             return False 
@@ -73,6 +74,11 @@ class ImageTransformer():
 
         else:
             pass 
+
+
+# method to convert raster images to vector images
+    def __convert_raster_to_svg_(self, input_path: str, output_path: str): 
+        pass
 
 
 
