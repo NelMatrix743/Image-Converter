@@ -3,10 +3,11 @@ from enum import Enum
 
 # enum class
 class ImgFormats(Enum): 
-    JPEG: str = 0 
-    PNG: str  = 1
-    SVG: str = 2 
-    WEBP: str = 3
+    JPEG: str = "JPEG"
+    JPG: str = "JPG"
+    PNG: str  = "PNG"
+    SVG: str = "SVG"
+    WEBP: str = "WEBP"
 
 # end of enum class implementation 
 
