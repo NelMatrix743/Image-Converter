@@ -16,7 +16,7 @@ import pathlib
 import time
 import colorama
 from collections.abc import Iterator 
-from package import screen, supported_formats
+from package import screen, supported_formats, conversionkit
 
 
 
@@ -68,12 +68,55 @@ def parser_initialiser() -> argparse.ArgumentParser:
     return argument_parser
 
 
+def input_image_type(file_name: str): 
+    file_extension: str = file_name.split('.')[-1]
+    
+    if file_extension == "jpeg" or file_extension == "jpg":
+        return supported_formats.ImgFormats.JPEG
+    
+    if file_extension == "png": 
+        return supported_formats.ImgFormats.PNG
+    
+    if file_extension == "webp":
+        return supported_formats.ImgFormats.WEBP
+    
+    if file_extension == "svg": 
+        return supported_formats.ImgFormats.SVG
+
+
+
+# convert a single input image file to the specified output image format;
 def run_single_conversion_task(args_: argparse.Namespace, input_: str, output_: str) -> None:
-    pass 
+    img_object: conversionkit.ImageTransformer = conversionkit.ImageTransformer(input_, output_)
+    format_: supported_formats.ImgFormats = input_image_type(os.path.basename(input_)) 
+    
+    if args_.JPEG: 
+        img_object.to_JPEG_(format_)
+ 
+    if args_.PNG: 
+        img_object.to_PNG_(format_)
 
+    if args_.WEBP: 
+        img_object.to_WEBP_(format_)
 
+    if args_.SVG: 
+        img_object.to_SVG_(format_)
+
+# convert multiple input image file to the speciied output image format;
 def run_multiple_conversion_task(args_: argparse.Namespace, iterator_: Iterator[str], output_: str) -> None: 
-    pass 
+    for element in iterator_: 
+        if args_.JPEG: 
+            pass 
+        
+        if args_.PNG: 
+            pass
+
+        if args_.WEBP:
+            pass 
+
+        if args_.SVG:
+            pass 
+
 
 
 def selected_type(argg: argparse.Namespace) -> str:
