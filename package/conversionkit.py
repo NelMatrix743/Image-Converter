@@ -2,7 +2,8 @@ import os
 import pathlib 
 from PIL import Image 
 from cairosvg import svg2png
-from supported_formats import ImgFormats
+from package.supported_formats import ImgFormats
+from package import screen
 
 
 
@@ -18,8 +19,10 @@ class ImageTransformer():
     def to_JPEG_(self, input_type: ImgFormats) -> bool:
         try:
             if input_type.name == ImgFormats.PNG.name: 
-                image_object = Image.open(self.input_path).convert("RGBA")
-                image_object.save(self.output_path, "PNG")
+                image_object = Image.open(self.input_path)
+                final_output = image_object.convert("RGB")
+                print(self.output_path)
+                final_output.save(self.output_path)
 
             elif input_type.name == ImgFormats.WEBP.name: 
                 image_object = Image.open(self.input_path).convert("RGB")
@@ -30,7 +33,7 @@ class ImageTransformer():
 
             return True
         except: 
-            return False 
+            return False
 
 
     def to_PNG_(self, input_type: ImgFormats) -> None: 

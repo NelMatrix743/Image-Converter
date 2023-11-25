@@ -16,7 +16,7 @@ import pathlib
 import time
 import colorama
 from collections.abc import Iterator 
-from package import screen, supported_formats, conversionkit
+from package import screen, conversionkit, supported_formats
 
 
 
@@ -140,9 +140,9 @@ def name_with_exten(argument: argparse.Namespace, name:str) -> str:
 
 
 def return_seperator(string: str) -> str | None: 
-    if string.find('/') != -1: 
+    if '/' in string: 
         return '/'
-    if string.find('\\') != -1: # using double backslashes to escape backslash escape sequence error; 
+    if '\\' in string: # using double backslashes to escape backslash escape sequence error; 
         return '\\'
     return None # if the string has no seperator  
 
@@ -156,16 +156,15 @@ def is_a_valid_imagefile(name: str) -> bool:
 
 def parse_output_file_path(arg: argparse.Namespace) -> str | None:
     raw_ : str = arg.o # output;
-    sep_ : str = return_seperator(raw_)
-
     refined_ : str = os.path.realpath(raw_) # to refine the provided pathname for further processing;
+    sep_ : str | None = return_seperator(refined_)
+
     components: list[str] = refined_.split(sep_)
     pre_output_file_name: str = components.pop(-1) # remove and store filename because it is does not exist yet;
-    #print(sep_ + str.join(sep_, components))
-
+    
     if os.path.exists(str.join(sep_, components)):
         components.append(name_with_exten(arg, pre_output_file_name))
-        return os.path.join(*components) # return the final pathname result;
+        return str.join(sep_, components)  # return the final pathname result;
 
     raise PathDoesNotExistsException # wrong output;
     
@@ -230,13 +229,11 @@ def run_program(parser: argparse.ArgumentParser) -> None:
         if args_namespace.o:  # parse output/destination path;
            try: 
                output_path = parse_output_file_path(args_namespace)
-               print(output_path)
            except PathDoesNotExistsException: 
                screen.error_message_display(OUTPUT_PATH_DOES_NOT_EXISTS_ERROR)  
                return
         else: 
             output_path = custom_output_file_path(args_namespace, input_path) # return custom output path; 
-        
         run_single_conversion_task(args_namespace, input_path, output_path)
         return # terminate the function;
 
