@@ -19,14 +19,12 @@ class ImageTransformer():
     def to_JPEG_(self, input_type: ImgFormats) -> bool:
         try:
             if input_type.name == ImgFormats.PNG.name: 
-                image_object = Image.open(self.input_path)
-                final_output = image_object.convert("RGB")
-                print(self.output_path)
-                final_output.save(self.output_path)
+                image_object = Image.open(self.input_path).convert("RGB")
+                image_object.save(self.output_path, "JPEG")
 
             elif input_type.name == ImgFormats.WEBP.name: 
                 image_object = Image.open(self.input_path).convert("RGB")
-                image_object.save(self.output_path, "WEBP")
+                image_object.save(self.output_path, "JPEG")
 
             elif input_type.name == ImgFormats.SVG.name: 
                 self.__convert_raster_to_svg_()
