@@ -102,6 +102,7 @@ def run_single_conversion_task(args_: argparse.Namespace, input_: str, output_: 
     if args_.SVG: 
         img_object.to_SVG_(format_)
 
+
 # convert multiple input image file to the speciied output image format;
 def run_multiple_conversion_task(args_: argparse.Namespace, iterator_: Iterator[str], output_: str) -> None: 
     for element in iterator_: 
