@@ -12,7 +12,7 @@ from package import screen
 # class that represents the given file entity: 
 class ImageTransformer(): 
     
-    def __init__(self, input_path: str, output_path: str): 
+    def __init__(self, input_path: str | None = None, output_path: str | None = None): 
         self.input_path: str = input_path
         self.output_path: str = output_path 
 
@@ -45,7 +45,6 @@ class ImageTransformer():
             return True
         except: 
             return False
-
 
 
     def to_WEBP_(self, input_type: ImgFormats) -> bool: 

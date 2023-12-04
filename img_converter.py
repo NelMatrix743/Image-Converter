@@ -87,6 +87,7 @@ def input_image_type(file_name: str):
 
 # convert a single input image file to the specified output image format;
 def run_single_conversion_task(args_: argparse.Namespace, input_: str, output_: str) -> None:
+
     img_object: conversionkit.ImageTransformer = conversionkit.ImageTransformer(input_, output_)
     format_: supported_formats.ImgFormats = input_image_type(os.path.basename(input_)) 
     
@@ -105,18 +106,35 @@ def run_single_conversion_task(args_: argparse.Namespace, input_: str, output_: 
 
 # convert multiple input image file to the speciied output image format;
 def run_multiple_conversion_task(args_: argparse.Namespace, iterator_: Iterator[str], output_: str) -> None: 
-    for element in iterator_: 
-        if args_.JPEG: 
-            pass 
-        
-        if args_.PNG: 
-            pass
+    img_object: conversionkit.ImageTransformer = conversionkit.ImageTransformer()
+    for each_file in iterator_: 
 
+        img_object.input_path = each_file
+        base_name: str = os.path.basename(each_file)
+        file_name:str = base_name.split('.')[0]
+        file_extension: str = base_name.split('.')[-1]
+
+        format_: supported_formats.ImgFormats = input_image_type(base_name)
+        if args_.JPEG:
+            if file_extension == "jpeg" or file_extension == "jpg":
+                continue
+            img_object.output_path = os.path.join(output_, (file_name + ".jpg"))
+            img_object.to_JPEG_(format_)
+        if args_.PNG:
+            if file_extension == "png": 
+                continue
+            img_object.output_path = os.path.join(output_, (file_name + ".png"))
+            img_object.to_PNG_(format_)
         if args_.WEBP:
-            pass 
-
+            if file_extension == "webp": 
+                continue
+            img_object.output_path = os.path.join(output_, (file_name + ".webp"))
+            img_object.to_WEBP_(format_)
         if args_.SVG:
-            pass 
+            if file_extension == "svg":
+                continue
+            img_object.output_path = os.path.join(output_, (file_name + ".svg"))
+            img_object.to_SVG_(format_)
 
 
 
@@ -193,9 +211,10 @@ def parse_output_directory_path(output_dir_: argparse.Namespace) -> str | None:
     
 
 def supported_file_input_iterator(input_: str) -> Iterator[str]: 
-    for entity in os.listdir(input_):
-        if os.path.isfile(os.path.join(input_, entity)) and is_a_valid_imagefile(entity):
-            yield entity 
+    realpath = os.path.realpath(input_)
+    for entity in os.listdir(realpath):
+        if os.path.isfile(os.path.join(realpath, entity)) and is_a_valid_imagefile(entity):
+            yield os.path.join(realpath, entity) 
 
 
 # main function of this program;
@@ -254,9 +273,11 @@ def run_program(parser: argparse.ArgumentParser) -> None:
                 screen.error_message_display(OUTPUT_DIRECTORY_PATH_DOES_NOT_EXISTS_ERROR)
                 return
             
-        # if user did not specify output directory:
-        output_path = os.path.join(os.getcwd(), "OUTPUT-DIRECTORY")
-
+        else: # if user did not specify output directory:
+            output_path = os.path.join(os.getcwd(), "OUTPUT-DIRECTORY")
+            if not os.path.exists(output_path):
+                os.mkdir(output_path) # create the output directory
+        
         run_multiple_conversion_task(args_namespace, valid_input_iterator, output_path)
         return # terminate the function;
 
