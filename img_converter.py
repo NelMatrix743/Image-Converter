@@ -90,23 +90,31 @@ def run_single_conversion_task(args_: argparse.Namespace, input_: str, output_: 
 
     img_object: conversionkit.ImageTransformer = conversionkit.ImageTransformer(input_, output_)
     format_: supported_formats.ImgFormats = input_image_type(os.path.basename(input_)) 
-    
+    conversion_sucessful: bool
+    screen.in_process_message_display("\n [*] Loading input file ...............%\n\n")
+    time.sleep(0.7) # sleep for 0.7 seconds
+    screen.success_message_display(f"[+] INPUT :: {input_}\n")
+    screen.success_message_display(f"[+] OUTPUT:: {output_}\n\n")
+    screen.in_process_message_display("[*] File conversion in progress............%\n\n")
     if args_.JPEG: 
-        img_object.to_JPEG_(format_)
- 
-    if args_.PNG: 
-        img_object.to_PNG_(format_)
-
-    if args_.WEBP: 
-        img_object.to_WEBP_(format_)
-
-    if args_.SVG: 
-        img_object.to_SVG_(format_)
-
+        conversion_sucessful = img_object.to_JPEG_(format_)
+    elif args_.PNG: 
+        conversion_sucessful = img_object.to_PNG_(format_)
+    elif args_.WEBP: 
+        conversion_sucessful = img_object.to_WEBP_(format_)
+    elif args_.SVG: 
+        conversion_sucessful = img_object.to_SVG_(format_)
+    
+    if conversion_sucessful:
+        screen.success_message_display("File conversion successful! Output file has been written to disk.\n")
+        return
+    screen.error_message_display("File conversion failure! Cannot convert file.\n")
+    
 
 # convert multiple input image file to the speciied output image format;
 def run_multiple_conversion_task(args_: argparse.Namespace, iterator_: Iterator[str], output_: str) -> None: 
     img_object: conversionkit.ImageTransformer = conversionkit.ImageTransformer()
+    conversion_sucessful: bool
     for each_file in iterator_: 
 
         img_object.input_path = each_file
@@ -119,22 +127,22 @@ def run_multiple_conversion_task(args_: argparse.Namespace, iterator_: Iterator[
             if file_extension == "jpeg" or file_extension == "jpg":
                 continue
             img_object.output_path = os.path.join(output_, (file_name + ".jpg"))
-            img_object.to_JPEG_(format_)
-        if args_.PNG:
+            conversion_sucessful = img_object.to_JPEG_(format_)
+        elif args_.PNG:
             if file_extension == "png": 
                 continue
             img_object.output_path = os.path.join(output_, (file_name + ".png"))
-            img_object.to_PNG_(format_)
-        if args_.WEBP:
+            conversion_sucessful = img_object.to_PNG_(format_)
+        elif args_.WEBP:
             if file_extension == "webp": 
                 continue
             img_object.output_path = os.path.join(output_, (file_name + ".webp"))
-            img_object.to_WEBP_(format_)
-        if args_.SVG:
+            conversion_sucessful = img_object.to_WEBP_(format_)
+        elif args_.SVG:
             if file_extension == "svg":
                 continue
             img_object.output_path = os.path.join(output_, (file_name + ".svg"))
-            img_object.to_SVG_(format_)
+            conversion_sucessful = img_object.to_SVG_(format_)
 
 
 
@@ -292,10 +300,4 @@ if __name__ ==  "__main__":
     run_program(parser_initialiser())
 
     print("\n\n", end='') # move two lines below;
-
-    # exit     
-    screen.in_process_message_display("Exiting program......")
-    time.sleep(1) # 1 second delay;
-    screen.success_message_display("Program exited successfully.")
-
 # end of program;

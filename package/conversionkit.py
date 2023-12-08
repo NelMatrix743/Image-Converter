@@ -80,7 +80,7 @@ class ImageTransformer():
 
 
 # method to convert raster images to vector images
-    def __convert_raster_to_svg_(self, image_format: str): 
+    def __convert_raster_to_svg_(self, image_format: str) -> None: 
         with open(self.input_path, "rb") as file:
             base_64: bytes = b64encode(file.read()) # reading binary content into byte string
 

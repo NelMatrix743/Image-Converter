@@ -18,7 +18,7 @@ program_banner_: str = r"""
 
 def welcome_screen() -> None:  
     """ Displays welcome message and program banner(ascii-art) """ 
-    print(Fore.BLUE, Style.BRIGHT, program_banner_, Style.RESET_ALL) # print banner and reset terminal color;
+    print(Fore.BLUE, Style.BRIGHT, program_banner_, Style.RESET_ALL, end="") # print banner and reset terminal color;
     #print(Fore.BLUE, Style.BRIGHT, sub_banner_)
 
 
