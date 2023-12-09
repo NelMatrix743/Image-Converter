@@ -87,15 +87,13 @@ def input_image_type(file_name: str):
 
 # convert a single input image file to the specified output image format;
 def run_single_conversion_task(args_: argparse.Namespace, input_: str, output_: str) -> None:
-
     img_object: conversionkit.ImageTransformer = conversionkit.ImageTransformer(input_, output_)
     format_: supported_formats.ImgFormats = input_image_type(os.path.basename(input_)) 
     conversion_sucessful: bool
-    screen.in_process_message_display("\n [*] Loading input file ...............%\n\n")
+    screen.in_process_message_display("\n [*] Loading input file...............%\n")
     time.sleep(0.7) # sleep for 0.7 seconds
-    screen.success_message_display(f"[+] INPUT :: {input_}\n")
-    screen.success_message_display(f"[+] OUTPUT:: {output_}\n\n")
-    screen.in_process_message_display("[*] File conversion in progress............%\n\n")
+    screen.in_process_message_display(f"[+] INPUT:: {input_}\n")
+    screen.in_process_message_display("[*] Beginning the file conversion process ...........%\n")
     if args_.JPEG: 
         conversion_sucessful = img_object.to_JPEG_(format_)
     elif args_.PNG: 
@@ -106,43 +104,68 @@ def run_single_conversion_task(args_: argparse.Namespace, input_: str, output_: 
         conversion_sucessful = img_object.to_SVG_(format_)
     
     if conversion_sucessful:
-        screen.success_message_display("File conversion successful! Output file has been written to disk.\n")
+        screen.success_message_display("[+] File conversion successful! Output file has been written to disk.\n")
+        screen.success_message_display(f"[+] LOCATION:: {output_}\n")
         return
-    screen.error_message_display("File conversion failure! Cannot convert file.\n")
+    screen.error_message_display("[-] File conversion failed! Cannot convert file.\n")
     
+
 
 # convert multiple input image file to the speciied output image format;
 def run_multiple_conversion_task(args_: argparse.Namespace, iterator_: Iterator[str], output_: str) -> None: 
     img_object: conversionkit.ImageTransformer = conversionkit.ImageTransformer()
     conversion_sucessful: bool
+    number_of_files_converted: int = 0 # number of file converted
+    file_count: int = 0 # total number of files in the iterator
+    screen.in_process_message_display("\n [*] Loading input directory...............%\n")
+    time.sleep(0.7) # sleep for 0.7 seconds
+    screen.in_process_message_display(f"[+] INPUT:: {args_.d}\n")
+    screen.in_process_message_display("[*] Beginning the file conversion process ...........%\n\n")
+    time.sleep(0.5) # sleep for 0.5 seconds
+    
     for each_file in iterator_: 
-
         img_object.input_path = each_file
         base_name: str = os.path.basename(each_file)
-        file_name:str = base_name.split('.')[0]
-        file_extension: str = base_name.split('.')[-1]
-
+        file_name:str = base_name.split('.')[0] # file name
+        file_extension: str = base_name.split('.')[-1] # file extension
         format_: supported_formats.ImgFormats = input_image_type(base_name)
+
+        screen.in_process_message_display(f"[{file_count}] FILE:: {each_file}\n")
+        file_count += 1
         if args_.JPEG:
-            if file_extension == "jpeg" or file_extension == "jpg":
+            if file_extension == "jpeg" or file_extension == "jpg": # if the file is already in JPEG format
+                screen.success_message_display("[+] The file is already in JPEG format\n")
                 continue
             img_object.output_path = os.path.join(output_, (file_name + ".jpg"))
             conversion_sucessful = img_object.to_JPEG_(format_)
         elif args_.PNG:
-            if file_extension == "png": 
+            if file_extension == "png": # if the file is already in PNG format
+                screen.success_message_display("[+] The file is already in PNG format\n")
                 continue
             img_object.output_path = os.path.join(output_, (file_name + ".png"))
             conversion_sucessful = img_object.to_PNG_(format_)
         elif args_.WEBP:
-            if file_extension == "webp": 
+            if file_extension == "webp": # if the file is already in WEBP format
+                screen.success_message_display("[+] The file is already in WEBP format\n")
                 continue
             img_object.output_path = os.path.join(output_, (file_name + ".webp"))
             conversion_sucessful = img_object.to_WEBP_(format_)
         elif args_.SVG:
-            if file_extension == "svg":
-                continue
+            if file_extension == "svg": # if the file is already in SVG format
+                screen.success_message_display("[+] The file is already in SVG format\n")
+                continue 
             img_object.output_path = os.path.join(output_, (file_name + ".svg"))
             conversion_sucessful = img_object.to_SVG_(format_)
+        
+        if conversion_sucessful:
+            screen.success_message_display("[+] Conversion successful!\n\n")
+            number_of_files_converted += 1
+            continue
+        screen.error_message_display("[-] Conversion failed!\n") # file could not be converted
+
+    screen.success_message_display(f"[*] Number of supported files in input:: {file_count}\n")
+    screen.success_message_display(f"[*] Number of files converted:: {number_of_files_converted}\n\n")
+    screen.success_message_display(f"[+] OUTPUT:: {output_}\n")
 
 
 
