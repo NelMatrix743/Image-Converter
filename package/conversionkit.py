@@ -1,10 +1,10 @@
+import io
 import os 
 import pathlib 
 from base64 import b64encode 
 from PIL import Image 
 from cairosvg import svg2png
 from package.supported_formats import ImgFormats
-from package import screen
 
 
 
@@ -28,8 +28,10 @@ class ImageTransformer():
                 image_object.save(self.output_path, "JPEG")
 
             elif input_type.name == ImgFormats.SVG.name: 
-                pass
+                self.__convert_vector_to_raster_(ImgFormats.JPEG.name)
+
             return True
+        
         except: 
             return False
 
@@ -41,8 +43,10 @@ class ImageTransformer():
                 image_object.save(self.output_path, "PNG")
 
             else: # SVG Format 
-                pass 
+                svg2png(url=self.input_path, write_to=self.output_path, output_width=1920, output_height=1080)
+
             return True
+        
         except: 
             return False
 
@@ -58,8 +62,10 @@ class ImageTransformer():
                 image_object.save(self.output_path, "WEBP")
 
             elif input_type.name == ImgFormats.SVG.name:
-                pass
+                self.__convert_vector_to_raster_(ImgFormats.WEBP.name)
+
             return True
+        
         except: 
             return False
         
@@ -67,20 +73,20 @@ class ImageTransformer():
     def to_SVG_(self, input_type: ImgFormats) -> bool: 
         try:
             if input_type.name == ImgFormats.PNG.name: 
-                self.__convert_raster_to_svg_(input_type.PNG.name.lower())
+                self.__convert_raster_to_vector_(input_type.PNG.name.lower())
 
             elif input_type.name == ImgFormats.JPEG.name or input_type.name == ImgFormats.JPG.name: 
-                self.__convert_raster_to_svg_(input_type.JPEG.name.lower())
+                self.__convert_raster_to_vector_(input_type.JPEG.name.lower())
 
             elif input_type.name == ImgFormats.WEBP.name: 
-                self.__convert_raster_to_svg_(input_type.WEBP.name.lower())
+                self.__convert_raster_to_vector_(input_type.WEBP.name.lower())
             return True
         except: 
             return False
 
 
 # method to convert raster images to vector images
-    def __convert_raster_to_svg_(self, image_format: str) -> None: 
+    def __convert_raster_to_vector_(self, image_format: str) -> None: 
         with open(self.input_path, "rb") as file:
             base_64: bytes = b64encode(file.read()) # reading binary content into byte string
 
@@ -100,6 +106,12 @@ class ImageTransformer():
             file.write(SVG_CODE) # creating a file and writing SVG content to the file
 
 
+    def __convert_vector_to_raster_(self, img_format: str, width: int = 1920, height: int = 1080) -> None:
+        # First, convert the svg content to png byte data. Then perform an in-memory data operation on the png content       
+        png_byte_content: bytes = svg2png(url=self.input_path, write_to=None, output_width=width, output_height=height)
+        image = Image.open(io.BytesIO(png_byte_content))
+
+        image.convert("RGB").save(self.output_path, img_format) # save image content
 
 # end of class implementation 
 

@@ -1,3 +1,4 @@
+.gitignore
 *.bat
 tasks_.txt
 old_code.txt

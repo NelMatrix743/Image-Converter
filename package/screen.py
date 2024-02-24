@@ -2,7 +2,7 @@ import colorama
 from colorama import Fore, Back, Style
 
 
-__programmer_info: str = Fore.GREEN + " Programmer.nick_name: Nelmatrix" + (" "*67) + Fore.GREEN  + "v-1.0.0"
+__programmer_info: str = Fore.GREEN + " Programmer.nick_name: Nelmatrix" + (" "*67) + Fore.GREEN  + "v-1.0.0\n"
 
 # Program welcome screen art
 program_banner_: str = r"""
@@ -22,22 +22,28 @@ def welcome_screen() -> None:
     #print(Fore.BLUE, Style.BRIGHT, sub_banner_)
 
 
-def success_message_display(message: str) -> None: 
+def success_message_display(message: str, type_indicator: str = '+', start_newline: int = 0, end_newline: int = 0) -> None: 
     """ Displays success message when a task is sucessfully completed """
-    __message__: str = Fore.GREEN + Style.BRIGHT + message
-    print(__message__, Style.RESET_ALL, end='') # print message and reset color;
+    nwln_start: str = '\n' * start_newline
+    nwln_end: str = '\n' * end_newline
+    __message__: str = Fore.GREEN + Style.BRIGHT + f"[{type_indicator}] " + message + Style.RESET_ALL
+    print(nwln_start, __message__, end=nwln_end) # print message and reset color;
 
 
-def error_message_display(message: str) -> None: 
+def error_message_display(message: str, type_indicator: str = '-', start_newline: int = 0, end_newline: int = 0) -> None: 
     """ Displays error message when a task is not sucessfully completed due to an error """
-    __message__: str = Fore.RED + Style.BRIGHT + message
-    print(__message__, Style.RESET_ALL, end='') # print message and reset color;
+    nwln_start: str = '\n' * start_newline
+    nwln_end: str = '\n' * end_newline
+    __message__: str = Fore.RED + Style.BRIGHT + f"[{type_indicator}] " + message + Style.RESET_ALL
+    print(nwln_start, __message__, end=nwln_end) # print message and reset color;
 
 
-def in_process_message_display(message: str) -> None:
+def in_process_message_display(message: str, type_indicator: str = '*', start_newline: int = 0, end_newline: int = 0) -> None:
     """ Displays a message when the program is currently processing a file """
-    __message__: str = Fore.YELLOW + Style.BRIGHT + message
-    print(__message__, Style.RESET_ALL, end='') # print message and reset color;
+    nwln_start: str = '\n' * start_newline
+    nwln_end: str = '\n' * end_newline
+    __message__: str = Fore.YELLOW + Style.BRIGHT + f"[{type_indicator}] " + message + Style.RESET_ALL
+    print(nwln_start, __message__, end=nwln_end) # print message and reset color;
 
 
 
